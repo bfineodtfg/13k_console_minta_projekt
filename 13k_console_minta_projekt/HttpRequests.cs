@@ -11,6 +11,29 @@ namespace _13k_console_minta_projekt
     class HttpRequests
     {
         HttpClient client = new HttpClient();
+        private async void Everything(string url,string requestType) {
+            
+            string serverUrl = "http://127.1.1.1:3000/"+url;
+            try
+            {
+                HttpResponseMessage response = null;
+                if (requestType == "get")
+                {
+                    response = await client.GetAsync(serverUrl);
+                }
+                response.EnsureSuccessStatusCode();
+                string stringResult = await response.Content.ReadAsStringAsync();
+                List<fruitClass> lista = JsonConvert.DeserializeObject<List<fruitClass>>(stringResult);
+                foreach (fruitClass item in lista)
+                {
+                    Console.WriteLine(item);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
         public async void listFruits() {
             List<string> lista = new List<string>();
             string url = "http://127.1.1.1:3000/fruits";
@@ -142,6 +165,41 @@ namespace _13k_console_minta_projekt
                 HttpContent sendThis = new StringContent(JsonString,Encoding.UTF8,"Application/JSON");
 
                 HttpResponseMessage response = await client.PostAsync(url, sendThis);
+                response.EnsureSuccessStatusCode();
+
+                string result = await response.Content.ReadAsStringAsync();
+
+                string message = JsonConvert.DeserializeObject<JsonMessage>(result).message;
+
+                Console.WriteLine(message);
+                Console.ReadKey();
+
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+        }
+        public async void UpdateFruits(string fruitName, int fruitPrice, int fruitWeight)
+        {
+            string url = "http://127.1.1.1:3000/addFruit";
+            try
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token.token);
+
+                var JsonData = new
+                {
+                    gyumolcsNev = fruitName,
+                    gyumolcsAr = fruitPrice,
+                    gyumolcsSuly = fruitWeight
+                };
+
+                string JsonString = JsonConvert.SerializeObject(JsonData);
+                HttpContent sendThis = new StringContent(JsonString, Encoding.UTF8, "Application/JSON");
+
+                HttpResponseMessage response = await client.PutAsync(url, sendThis);
                 response.EnsureSuccessStatusCode();
 
                 string result = await response.Content.ReadAsStringAsync();

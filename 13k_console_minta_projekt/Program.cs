@@ -36,52 +36,21 @@ namespace _13k_console_minta_projekt
                         break;
                     case 2:
                         {
-                            Console.Clear();
-                            string text = "Regisztráció";
-                            Console.SetCursorPosition(Console.WindowWidth / 2 - text.Length / 2, 1);
-                            Console.Write(text);
-
-                            Console.SetCursorPosition(10, 3);
-                            Console.Write("Felhasználónév: ");
-                            string username = Console.ReadLine();
-
-                            Console.SetCursorPosition(10, 5);
-                            Console.Write("Jelszó: ");
-                            string password = Console.ReadLine();
-
-                            req.Registration(username, password);
-
+                            string[] temp = GetInfo("Regisztráció", "Felhasználónév", "Jelszó");
+                            req.Registration(temp[0], temp[1]);
                             Console.ReadKey();
                             ReDrawMenu();
-
                         }
                         break;
                     case 3:
-                        Console.Clear();
                         {
-
-                            string text = "Bejelentkezés";
-                            Console.SetCursorPosition(Console.WindowWidth / 2 - text.Length / 2, 1);
-                            Console.Write(text);
-
-                            Console.SetCursorPosition(10, 3);
-                            Console.Write("Felhasználónév: ");
-                            string username = Console.ReadLine();
-
-                            Console.SetCursorPosition(10, 5);
-                            Console.Write("Jelszó: ");
-                            string password = Console.ReadLine();
-
-                            req.Login(username, password);
-
+                            string[] temp = GetInfo("Bejelentkezés", "Felhasználónév", "Jelszó");
+                            req.Login(temp[0], temp[1]);
                             Console.ReadKey();
                             DrawLoginMenu();
-
                         }
                         break;
                 }
-
-
             }
             catch (Exception e)
             {
@@ -110,34 +79,25 @@ namespace _13k_console_minta_projekt
                         DrawLoginMenu();
                         break;
                     case 2:
-                        Console.Clear();
                         {
-                            string text = "Gyümölcs hozzáadása";
-                            Console.SetCursorPosition(Console.WindowWidth / 2 - text.Length / 2, 1);
-                            Console.Write(text);
-
-                            Console.SetCursorPosition(10, 3);
-                            Console.Write("Gyümölcs neve: ");
-                            string name = Console.ReadLine();
-
-                            Console.SetCursorPosition(10, 5);
-                            Console.Write("Gyümölcs ára: ");
-                            int price = int.Parse(Console.ReadLine().Trim());
-
-
-                            Console.SetCursorPosition(10, 7);
-                            Console.Write("Gyümölcs súlya: ");
-                            int weight = int.Parse(Console.ReadLine().Trim());
-
-                            req.AddFruits(name, price, weight);
-
+                            string[] temp = GetInfo("Gyümölcs hozzáadása", "Gyümölcs neve", "Gyümölcs ára", "Gyümölcs súlya");
+                            req.AddFruits(temp[0], int.Parse(temp[1]), int.Parse(temp[2]));
                             Console.ReadKey();
                             DrawLoginMenu();
                         }
                         break;
                     case 3:
+                        {
+                            string[] temp = GetInfo("Gyümölcs szerkesztése", "Gyümölcs neve", "Gyümölcs ára", "Gyümölcs súlya");
+                            req.UpdateFruits(temp[0], int.Parse(temp[1]), int.Parse(temp[2]));
+                            Console.ReadKey();
+                            DrawLoginMenu();
+                        }
                         break;
                     case 4:
+                        Token.token = null;
+                        Console.ReadKey();
+                        ReDrawMenu();
                         break;
                 }
             }
@@ -147,5 +107,35 @@ namespace _13k_console_minta_projekt
             }
             
         }
+
+        static string[] GetInfo(string title, string firstData, string secondData, string thirdData = null) {
+            Console.Clear();
+
+            Console.SetCursorPosition(Console.WindowWidth / 2 - title.Length / 2, 1);
+            Console.Write(title);
+
+            Console.SetCursorPosition(10, 3);
+            Console.Write(firstData+": ");
+            string name = Console.ReadLine().Trim();
+
+            Console.SetCursorPosition(10, 5);
+            Console.Write(secondData + ": ");
+            string price = Console.ReadLine().Trim();
+
+            string weight = null;
+
+            if (thirdData != null)
+            {
+                Console.SetCursorPosition(10, 7);
+                Console.Write(thirdData + ": ");
+                weight = Console.ReadLine().Trim();
+            }
+            if (weight == null)
+            {
+                return new string[] { name, price };
+            }
+            return new string[] { name, price, weight };
+        }
+
     }
 }
