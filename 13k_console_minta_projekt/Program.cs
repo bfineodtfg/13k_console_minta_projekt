@@ -75,6 +75,7 @@ namespace _13k_console_minta_projekt
                             req.Login(username, password);
 
                             Console.ReadKey();
+                            DrawLoginMenu();
 
                         }
                         break;
@@ -88,7 +89,6 @@ namespace _13k_console_minta_projekt
                 Console.ReadKey();
                 ReDrawMenu();
             }
-
         }
         public static void DrawLoginMenu()
         {
@@ -105,9 +105,35 @@ namespace _13k_console_minta_projekt
                 switch (selectedMenu)
                 {
                     case 1:
-                        req.GetPersonalFruits()
+                        req.GetPersonalFruits();
+                        Console.ReadKey();
+                        DrawLoginMenu();
                         break;
                     case 2:
+                        Console.Clear();
+                        {
+                            string text = "Gyümölcs hozzáadása";
+                            Console.SetCursorPosition(Console.WindowWidth / 2 - text.Length / 2, 1);
+                            Console.Write(text);
+
+                            Console.SetCursorPosition(10, 3);
+                            Console.Write("Gyümölcs neve: ");
+                            string name = Console.ReadLine();
+
+                            Console.SetCursorPosition(10, 5);
+                            Console.Write("Gyümölcs ára: ");
+                            int price = int.Parse(Console.ReadLine().Trim());
+
+
+                            Console.SetCursorPosition(10, 7);
+                            Console.Write("Gyümölcs súlya: ");
+                            int weight = int.Parse(Console.ReadLine().Trim());
+
+                            req.AddFruits(name, price, weight);
+
+                            Console.ReadKey();
+                            DrawLoginMenu();
+                        }
                         break;
                     case 3:
                         break;

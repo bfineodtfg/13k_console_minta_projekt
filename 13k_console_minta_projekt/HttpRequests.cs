@@ -87,7 +87,7 @@ namespace _13k_console_minta_projekt
                 Token.token = JsonConvert.DeserializeObject<JsonMessage>(result).token;
 
                 Console.WriteLine(message);
-                Program.DrawLoginMenu();
+                
 
 
             }
@@ -114,6 +114,42 @@ namespace _13k_console_minta_projekt
                 {
                     Console.WriteLine(item.nev);
                 }
+
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+        }
+
+        public async void AddFruits(string fruitName, int fruitPrice, int fruitWeight)
+        {
+            string url = "http://127.1.1.1:3000/addFruit";
+            try
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token.token);
+
+                var JsonData = new
+                {
+                    gyumolcsNev = fruitName,
+                    gyumolcsAr = fruitPrice,
+                    gyumolcsSuly = fruitWeight
+                };
+
+                string JsonString = JsonConvert.SerializeObject(JsonData);
+                HttpContent sendThis = new StringContent(JsonString,Encoding.UTF8,"Application/JSON");
+
+                HttpResponseMessage response = await client.PostAsync(url, sendThis);
+                response.EnsureSuccessStatusCode();
+
+                string result = await response.Content.ReadAsStringAsync();
+
+                string message = JsonConvert.DeserializeObject<JsonMessage>(result).message;
+
+                Console.WriteLine(message);
+                Console.ReadKey();
 
 
             }
