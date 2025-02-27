@@ -26,13 +26,13 @@ namespace _13k_console_minta_projekt
                 {
                     string jsonString = JsonConvert.SerializeObject(jsonData);
                     HttpContent sendThis = new StringContent(jsonString, Encoding.UTF8, "Application/JSON");
-                    response = await client.PostAsync(url, sendThis);
+                    response = await client.PostAsync(serverUrl, sendThis);
                 }
                 else if(requestType.ToLower() == "put")
                 {
                     string jsonString = JsonConvert.SerializeObject(jsonData);
                     HttpContent sendThis = new StringContent(jsonString, Encoding.UTF8, "Application/JSON");
-                    response = await client.PutAsync(url, sendThis);
+                    response = await client.PutAsync(serverUrl, sendThis);
                 }
                 response.EnsureSuccessStatusCode();
                 string stringResult = await response.Content.ReadAsStringAsync();
