@@ -11,15 +11,25 @@ namespace _13k_console_minta_projekt
     class HttpRequests
     {
         HttpClient client = new HttpClient();
-        private async void Everything(string url,string requestType) {
+        private async void Everything(string url,string requestType,object jsonData) {
             
             string serverUrl = "http://127.1.1.1:3000/"+url;
             try
             {
                 HttpResponseMessage response = null;
-                if (requestType == "get")
+                if (requestType.ToLower() == "get")
                 {
                     response = await client.GetAsync(serverUrl);
+                }
+                else if (requestType.ToLower() == "post")
+                {
+                    string jsonString = JsonConvert.SerializeObject(jsonData);
+                    HttpContent sendThis = new StringContent(jsonString, Encoding.UTF8, "Application/JSON");
+                    response = await client.PostAsync(url, sendThis);
+                }
+                else if(requestType.ToLower() == "put")
+                {
+
                 }
                 response.EnsureSuccessStatusCode();
                 string stringResult = await response.Content.ReadAsStringAsync();
