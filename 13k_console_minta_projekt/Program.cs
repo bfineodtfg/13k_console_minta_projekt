@@ -10,12 +10,12 @@ namespace _13k_console_minta_projekt
     {
         static int selectedMenu;
         static HttpRequests req;
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             req = new HttpRequests();
-            ReDrawMenu();
+            await ReDrawMenu();
         }
-        static void ReDrawMenu()
+        static async Task ReDrawMenu()
         {
             Console.Clear();
             Console.WriteLine("1. Gyümölcsök listázása");
@@ -29,25 +29,36 @@ namespace _13k_console_minta_projekt
                 switch (selectedMenu)
                 {
                     case 1:
-                        req.listFruits();
+                        List<string> fruitNames = await req.listFruits();
+                        if (fruitNames.Count > 0)
+                            foreach (string item in fruitNames)
+                            {
+                                Console.WriteLine(item);
+                            }
+                        else
+                            Console.WriteLine("A lista üres");
                         Console.WriteLine("Folytatáshoz nyomj meg egy gombot");
                         Console.ReadKey();
-                        ReDrawMenu();
+                        await ReDrawMenu();
                         break;
                     case 2:
                         {
                             string[] temp = GetInfo("Regisztráció", "Felhasználónév", "Jelszó");
-                            req.Registration(temp[0], temp[1]);
+                            Console.WriteLine(await req.Registration(temp[0], temp[1]));
                             Console.ReadKey();
-                            ReDrawMenu();
+                            await ReDrawMenu();
                         }
                         break;
                     case 3:
                         {
                             string[] temp = GetInfo("Bejelentkezés", "Felhasználónév", "Jelszó");
-                            req.Login(temp[0], temp[1]);
+                            string result = await req.Login(temp[0], temp[1]);
+                            Console.WriteLine(result);
                             Console.ReadKey();
-                            DrawLoginMenu();
+                            if (result != null && Token.token != null)
+                                await DrawLoginMenu();
+                            else
+                                await ReDrawMenu();
                         }
                         break;
                 }
@@ -56,10 +67,10 @@ namespace _13k_console_minta_projekt
             {
                 Console.WriteLine(e.Message);
                 Console.ReadKey();
-                ReDrawMenu();
+                await ReDrawMenu();
             }
         }
-        public static void DrawLoginMenu()
+        public async static Task DrawLoginMenu()
         {
             Console.Clear();
             Console.WriteLine("1. Saját gyümölcsök listázása");
@@ -74,30 +85,35 @@ namespace _13k_console_minta_projekt
                 switch (selectedMenu)
                 {
                     case 1:
-                        req.GetPersonalFruits();
+                        List<jsonResponseData> fruits = await req.GetPersonalFruits();
+                        foreach (jsonResponseData item in fruits)
+                        {
+                            Console.WriteLine($"Gyümölcs neve: {item.nev}, ára: {item.ar}");
+                        }
                         Console.ReadKey();
-                        DrawLoginMenu();
+                        await DrawLoginMenu();
                         break;
                     case 2:
                         {
                             string[] temp = GetInfo("Gyümölcs hozzáadása", "Gyümölcs neve", "Gyümölcs ára", "Gyümölcs súlya");
-                            req.AddFruits(temp[0], int.Parse(temp[1]), int.Parse(temp[2]));
+                            string result = await req.AddFruits(temp[0], int.Parse(temp[1]), int.Parse(temp[2]));
+                            Console.WriteLine(result);
                             Console.ReadKey();
-                            DrawLoginMenu();
+                            await DrawLoginMenu();
                         }
                         break;
                     case 3:
                         {
                             string[] temp = GetInfo("Gyümölcs szerkesztése", "Gyümölcs neve", "Gyümölcs ára", "Gyümölcs súlya");
-                            req.UpdateFruits(temp[0], int.Parse(temp[1]), int.Parse(temp[2]));
+                            Console.WriteLine(await req.UpdateFruits(temp[0], int.Parse(temp[1]), int.Parse(temp[2])));
                             Console.ReadKey();
-                            DrawLoginMenu();
+                            await DrawLoginMenu();
                         }
                         break;
                     case 4:
                         Token.token = null;
                         Console.ReadKey();
-                        ReDrawMenu();
+                        await ReDrawMenu();
                         break;
                 }
             }

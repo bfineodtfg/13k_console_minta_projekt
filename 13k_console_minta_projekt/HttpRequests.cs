@@ -50,8 +50,8 @@ namespace _13k_console_minta_projekt
             string url = "fruits";
             try
             {
-                string stringResult = await Everything(url, "get");
-                lista = JsonConvert.DeserializeObject<List<jsonResponseData>>(stringResult).Select(fruit => fruit.nev).ToList();
+                string result = await Everything(url, "get");
+                lista = JsonConvert.DeserializeObject<List<jsonResponseData>>(result).Select(fruit => fruit.nev).ToList();
             }
             catch (Exception e)
             {
@@ -59,9 +59,9 @@ namespace _13k_console_minta_projekt
             }
             return lista;
         }
-        public async void Registration(string username, string password)
+        public async Task<string> Registration(string username, string password)
         {
-            string url = "http://127.1.1.1:3000/register";
+            string url = "register";
             try
             {
                 var jsonData = new
@@ -70,31 +70,21 @@ namespace _13k_console_minta_projekt
                     registerPassword = password
                 };
 
-                string jsonString = JsonConvert.SerializeObject(jsonData);
-
-                HttpContent sendThis = new StringContent(jsonString, Encoding.UTF8, "Application/JSON");
-
-                HttpResponseMessage response = await client.PostAsync(url,sendThis);
-                response.EnsureSuccessStatusCode();
-
-                string result = await response.Content.ReadAsStringAsync();
-
-                string message = JsonConvert.DeserializeObject<JsonMessage>(result).message;
+                string result = await Everything(url,"post",jsonData);
+                string message = JsonConvert.DeserializeObject<jsonResponseData>(result).message;
                 
-                Console.WriteLine(message);
-
-
+                return message;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+                return null;
             }
-
         }
 
-        public async void Login(string username, string password)
+        public async Task<string> Login(string username, string password)
         {
-            string url = "http://127.1.1.1:3000/login";
+            string url = "login";
             try
             {
                 var jsonData = new
@@ -103,125 +93,87 @@ namespace _13k_console_minta_projekt
                     loginPassword = password
                 };
 
-                string jsonString = JsonConvert.SerializeObject(jsonData);
+                string result = await Everything(url,"post",jsonData);
 
-                HttpContent sendThis = new StringContent(jsonString, Encoding.UTF8, "Application/JSON");
+                string message = JsonConvert.DeserializeObject<jsonResponseData>(result).message;
+                Token.token = JsonConvert.DeserializeObject<jsonResponseData>(result).token;
 
-                HttpResponseMessage response = await client.PostAsync(url, sendThis);
-                response.EnsureSuccessStatusCode();
+                return message;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
 
-                string result = await response.Content.ReadAsStringAsync();
+        }
+        public async Task<List<jsonResponseData>> GetPersonalFruits()
+        {
+            List<jsonResponseData> fruits = new List<jsonResponseData>();
+            string url = "personalFruits";
+            try
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token.token);
 
-                string message = JsonConvert.DeserializeObject<JsonMessage>(result).message;
-                Token.token = JsonConvert.DeserializeObject<JsonMessage>(result).token;
-
-                Console.WriteLine(message);
-                
-
-
+                string result = await Everything(url,"get");
+                fruits =  JsonConvert.DeserializeObject<List<jsonResponseData>>(result);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
-
-        }
-        public async void GetPersonalFruits()
-        {
-            string url = "http://127.1.1.1:3000/personalFruits";
-            try
-            {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token.token);
-                HttpResponseMessage response = await client.GetAsync(url);
-                response.EnsureSuccessStatusCode();
-
-                string result = await response.Content.ReadAsStringAsync();
-
-                List<fruitClass> personalFruits =  JsonConvert.DeserializeObject<List<fruitClass>>(result);
-
-                foreach (fruitClass item in personalFruits)
-                {
-                    Console.WriteLine(item.nev);
-                }
-
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-
+            return fruits;
         }
 
-        public async void AddFruits(string fruitName, int fruitPrice, int fruitWeight)
+        public async Task<string> AddFruits(string fruitName, int fruitPrice, int fruitWeight)
         {
-            string url = "http://127.1.1.1:3000/addFruit";
+            string url = "addFruit";
             try
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token.token);
 
-                var JsonData = new
+                var jsonData = new
                 {
                     gyumolcsNev = fruitName,
                     gyumolcsAr = fruitPrice,
                     gyumolcsSuly = fruitWeight
                 };
 
-                string JsonString = JsonConvert.SerializeObject(JsonData);
-                HttpContent sendThis = new StringContent(JsonString,Encoding.UTF8,"Application/JSON");
+                string result = await Everything(url, "post", jsonData);
 
-                HttpResponseMessage response = await client.PostAsync(url, sendThis);
-                response.EnsureSuccessStatusCode();
-
-                string result = await response.Content.ReadAsStringAsync();
-
-                string message = JsonConvert.DeserializeObject<JsonMessage>(result).message;
-
-                Console.WriteLine(message);
-                Console.ReadKey();
-
-
+                string message = JsonConvert.DeserializeObject<jsonResponseData>(result).message;
+                return message;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+                return null;
             }
-
         }
-        public async void UpdateFruits(string fruitName, int fruitPrice, int fruitWeight)
+        public async Task<string> UpdateFruits(string fruitName, int fruitPrice, int fruitWeight)
         {
-            string url = "http://127.1.1.1:3000/addFruit";
+            string url = "addFruit";
             try
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token.token);
 
-                var JsonData = new
+                var jsonData = new
                 {
                     gyumolcsNev = fruitName,
                     gyumolcsAr = fruitPrice,
                     gyumolcsSuly = fruitWeight
                 };
 
-                string JsonString = JsonConvert.SerializeObject(JsonData);
-                HttpContent sendThis = new StringContent(JsonString, Encoding.UTF8, "Application/JSON");
+                string result = await Everything(url, "put", jsonData);
 
-                HttpResponseMessage response = await client.PutAsync(url, sendThis);
-                response.EnsureSuccessStatusCode();
-
-                string result = await response.Content.ReadAsStringAsync();
-
-                string message = JsonConvert.DeserializeObject<JsonMessage>(result).message;
-
-                Console.WriteLine(message);
-                Console.ReadKey();
-
-
+                string message = JsonConvert.DeserializeObject<jsonResponseData>(result).message;
+                return message;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+                return null;
             }
-
         }
     }
 }
