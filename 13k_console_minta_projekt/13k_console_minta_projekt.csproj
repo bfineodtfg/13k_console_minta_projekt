@@ -46,10 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="fruitClass.cs" />
-    <Compile Include="fruitName.cs" />
+    <Compile Include="jsonResponseData.cs" />
     <Compile Include="HttpRequests.cs" />
-    <Compile Include="JsonMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Token.cs" />

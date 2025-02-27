@@ -5,13 +5,14 @@ using System.Text;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace _13k_console_minta_projekt
 {
     class HttpRequests
     {
         HttpClient client = new HttpClient();
-        private async void Everything(string url,string requestType,object jsonData) {
+        private async Task<string> Everything(string url,string requestType,object jsonData = null) {
             
             string serverUrl = "http://127.1.1.1:3000/"+url;
             try
@@ -29,39 +30,34 @@ namespace _13k_console_minta_projekt
                 }
                 else if(requestType.ToLower() == "put")
                 {
-
+                    string jsonString = JsonConvert.SerializeObject(jsonData);
+                    HttpContent sendThis = new StringContent(jsonString, Encoding.UTF8, "Application/JSON");
+                    response = await client.PutAsync(url, sendThis);
                 }
                 response.EnsureSuccessStatusCode();
                 string stringResult = await response.Content.ReadAsStringAsync();
-                List<fruitClass> lista = JsonConvert.DeserializeObject<List<fruitClass>>(stringResult);
-                foreach (fruitClass item in lista)
-                {
-                    Console.WriteLine(item);
-                }
+                return stringResult;
+                
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+                return "";
             }
         }
-        public async void listFruits() {
+        public async Task<List<string>> listFruits() {
             List<string> lista = new List<string>();
-            string url = "http://127.1.1.1:3000/fruits";
+            string url = "fruits";
             try
             {
-                HttpResponseMessage response = await client.GetAsync(url);
-                response.EnsureSuccessStatusCode();
-                string stringResult = await response.Content.ReadAsStringAsync();
-                lista = JsonConvert.DeserializeObject<List<fruitName>>(stringResult).Select(fruit => fruit.nev).ToList();
-                foreach (string item in lista)
-                {
-                    Console.WriteLine(item);
-                }
+                string stringResult = await Everything(url, "get");
+                lista = JsonConvert.DeserializeObject<List<jsonResponseData>>(stringResult).Select(fruit => fruit.nev).ToList();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
+            return lista;
         }
         public async void Registration(string username, string password)
         {
