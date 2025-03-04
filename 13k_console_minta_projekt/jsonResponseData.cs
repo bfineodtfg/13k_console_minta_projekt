@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace _13k_console_minta_projekt
 {
-    class jsonResponseData
+    public class jsonResponseData
     {
         public int id { get; set; }
         public string nev { get; set; }

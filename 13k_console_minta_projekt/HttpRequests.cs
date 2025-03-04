@@ -9,12 +9,13 @@ using System.Threading.Tasks;
 
 namespace _13k_console_minta_projekt
 {
-    class HttpRequests
+    public class HttpRequests
     {
         HttpClient client = new HttpClient();
-        private async Task<string> Everything(string url,string requestType,object jsonData = null) {
-            
-            string serverUrl = "http://127.1.1.1:3000/"+url;
+        private async Task<string> Everything(string url, string requestType, object jsonData = null)
+        {
+
+            string serverUrl = "http://127.1.1.1:3000/" + url;
             try
             {
                 HttpResponseMessage response = null;
@@ -28,16 +29,20 @@ namespace _13k_console_minta_projekt
                     HttpContent sendThis = new StringContent(jsonString, Encoding.UTF8, "Application/JSON");
                     response = await client.PostAsync(serverUrl, sendThis);
                 }
-                else if(requestType.ToLower() == "put")
+                else if (requestType.ToLower() == "put")
                 {
                     string jsonString = JsonConvert.SerializeObject(jsonData);
                     HttpContent sendThis = new StringContent(jsonString, Encoding.UTF8, "Application/JSON");
                     response = await client.PutAsync(serverUrl, sendThis);
                 }
+                else if (requestType.ToLower() == "delete")
+                {
+                    response = await client.DeleteAsync(serverUrl);
+                }
                 response.EnsureSuccessStatusCode();
                 string stringResult = await response.Content.ReadAsStringAsync();
                 return stringResult;
-                
+
             }
             catch (Exception e)
             {
@@ -45,7 +50,23 @@ namespace _13k_console_minta_projekt
                 return "";
             }
         }
-        public async Task<List<string>> listFruits() {
+
+        public async Task<string> Delete(int id) {
+            string Result = "";
+            string url = "deleteFruit/" + id;
+            try
+            {
+                string result = await Everything(url, "get");
+                Result = JsonConvert.DeserializeObject<jsonResponseData>(result).message;
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+            return Result;
+        }
+        public async Task<List<string>> listFruits()
+        {
             List<string> lista = new List<string>();
             string url = "fruits";
             try
@@ -70,9 +91,9 @@ namespace _13k_console_minta_projekt
                     registerPassword = password
                 };
 
-                string result = await Everything(url,"post",jsonData);
+                string result = await Everything(url, "post", jsonData);
                 string message = JsonConvert.DeserializeObject<jsonResponseData>(result).message;
-                
+
                 return message;
             }
             catch (Exception e)
@@ -93,7 +114,7 @@ namespace _13k_console_minta_projekt
                     loginPassword = password
                 };
 
-                string result = await Everything(url,"post",jsonData);
+                string result = await Everything(url, "post", jsonData);
 
                 string message = JsonConvert.DeserializeObject<jsonResponseData>(result).message;
                 Token.token = JsonConvert.DeserializeObject<jsonResponseData>(result).token;
@@ -115,8 +136,8 @@ namespace _13k_console_minta_projekt
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token.token);
 
-                string result = await Everything(url,"get");
-                fruits =  JsonConvert.DeserializeObject<List<jsonResponseData>>(result);
+                string result = await Everything(url, "get");
+                fruits = JsonConvert.DeserializeObject<List<jsonResponseData>>(result);
             }
             catch (Exception e)
             {
